@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: db
+    build: db
+    restart: always
+    environment:
+      POSTGRES_USER: nwstories
+      POSTGRES_PASSWORD: 9i_emg98!ALutWdJL0
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      network-sae:
+        ipv4_address: 10.5.0.5
+
+  site:
+    container_name: site
+    build: IUTAIX-SAES3-WebSite
+    restart: always
+    environment:
+      DB_HOST: db
+      DB_USERS_DBNAME: users
+      DB_STORIES_DBNAME: stories
+      DB_USER: nwstories
+      DB_PASSWORD: 9i_emg98!ALutWdJL0
+    ports:
+     - "8090:80"
+    volumes:
+     - site:/var/www/html
+    networks:
+      network-sae:
+        ipv4_address: 10.5.0.4
+    depends_on:
+      - db
+
+  server:
+    container_name: server
+    build: SAES3-Server
+    restart: always
+    environment:
+      DB_STORIES_URL: jdbc:postgresql://db:5432/stories
+      DB_USERS_URL: jdbc:postgresql://db:5432/users
+      DB_LOGIN: nwstories
+      DB_PASSWORD: 9i_emg98!ALutWdJL0
+    ports:
+     - "10013:10013"
+    volumes:
+      - server:/usr/src/myapp/
+    networks:
+      network-sae:
+        ipv4_address: 10.5.0.6
+    depends_on:
+      - db
+
+volumes:
+  db-data:
+  site:
+  server:
+
+networks:
+  network-sae:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.5.0.0/16
+         gateway: 10.5.0.1
