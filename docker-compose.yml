@@ -11,14 +11,14 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - ./db:/var/lib/postgresql/data
     networks:
       network-sae:
         ipv4_address: 10.5.0.5
 
   site:
     container_name: site
-    build: IUTAIX-SAES3-WebSite
+    build: ./site/IUTAIX-SAES3-WebSite
     restart: always
     environment:
       DB_HOST: db
@@ -27,9 +27,10 @@ services:
       DB_USER: nwstories
       DB_PASSWORD: 9i_emg98!ALutWdJL0
     ports:
-     - "8090:80"
+     - "443:443"
     volumes:
-     - site:/var/www/html
+     - ./site/IUTAIX-SAES3-WebSite:/var/www/html
+     - ./site/certs:/etc/apache2/ssl/
     networks:
       network-sae:
         ipv4_address: 10.5.0.4
@@ -48,7 +49,7 @@ services:
     ports:
      - "10013:10013"
     volumes:
-      - server:/usr/src/myapp/
+      - ./SAES3-Server:/usr/src/myapp/
     networks:
       network-sae:
         ipv4_address: 10.5.0.6
